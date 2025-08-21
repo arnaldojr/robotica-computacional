@@ -6,7 +6,8 @@ Para facilitar o desenvolvimento, fornecemos uma **estrutura base** de um nó da
 * Nó de ação base: [base_action.py](../util/base_action.py)
 * Nó "cliente" da ação: [base_control.py](../util/base_control.py)
 
-Baixe os arquivos e coloque-os em uma pasta de fácil acesso.
+!!! dica
+    Baixe os arquivos e coloque-os em um diretório qualquer de fácil acesso, você usará ele como código base.  
 
 Agora, vamos entender o papel de cada parte.
 
@@ -52,7 +53,10 @@ class Acao(Node): # Mude o nome da classe
 
 Nesta parte, passamos para o construtor o **nome do nó** e iniciamos a **máquina de estados** (`self.state_machine`), o **estado inicial** (`self.robot_state`) e os **publishers/subscribers** necessários, por padrão, o publisher do `cmd_vel` já está definido.
 
-**Quando mais de um nó forem utilizar a mesma ação, será necessário mudar o nome do nó para algo mais específico.**
+!!! warning
+    Quando múltiplos nós utilizarem a mesma ação, é necessário renomear cada nó para um nome mais específico, a fim de evitar conflitos e garantir clareza na identificação.
+
+Agora, definimos a função `reset()`, essa função deve ser chamada para iniciar a ação. A função `reset()` faz o seguinte:
 
 ```python
     def reset(self):
@@ -63,14 +67,15 @@ Nesta parte, passamos para o construtor o **nome do nó** e iniciamos a **máqui
         ### Iniciar variaveis da ação
 ```
 
-Nesta parte, definimos a função `reset()`, essa função deve ser chamada para iniciar a ação. A função `reset()` faz o seguinte:
 
 1. Inicializa a variável `self.twist`,
-2. Define o estado do robô para o estado inicial da ação (mude para o estado inicial da sua ação)
-3. Inicia o timer, `self.timer` que chama a função `control()` a cada 0,25 segundos.
+2. Define o estado do robô para o estado inicial da ação (é necessário mudar para o estado inicial da sua ação),
+3. Inicia o timer, `self.timer` que chama a função `control()` a cada 0,25 segundos,
 4. Por fim, você deve inicializar as variáveis necessárias para a ação.
 
-A partir desse ponto, vamos seguir uma máquina de estado padrão, até o fim da ação.
+A partir desse ponto, seguimos uma máquina de estado padrão, até o fim da ação.
+
+Ao final da ação, o estado do robô deve ser alterado para `stop`. Este estado deve:
 
 ```python
     def stop(self):
@@ -81,11 +86,12 @@ A partir desse ponto, vamos seguir uma máquina de estado padrão, até o fim da
         self.robot_state = 'done' # Ação finalizada
 ```
 
-Ao final da ação, o estado do robô deve ser alterado para `stop`. Este estado deve:
-
 1. Parar o robô;
 2. Cancelar o timer;
 3. Em seguida, mudar para o estado `'done'` (finalização).
+
+
+O `control()`, é chamado pelo timer a cada 0,25 segundos. Ela imprime o estado atual do robô e chama o método correspondente ao estado atual do robô na máquina de estados (`self.state_machine[self.robot_state]()`). Por fim, ela publica a velocidade do robô no tópico `cmd_vel`.
 
 ```python
     def control(self): # Controla a máquina de estados - eh chamado pelo timer
@@ -93,8 +99,6 @@ Ao final da ação, o estado do robô deve ser alterado para `stop`. Este estado
         self.state_machine[self.robot_state]() # Chama o método do estado atual 
         self.cmd_vel_pub.publish(self.twist) # Publica a velocidade
 ```
-
-Outra função importante é a `control()`, que é chamada pelo timer a cada 0,25 segundos. Ela imprime o estado atual do robô e chama o método correspondente ao estado atual do robô na máquina de estados (`self.state_machine[self.robot_state]()`). Por fim, ela publica a velocidade do robô no tópico `cmd_vel`.
 
 !!! importante
     **A função control deve ser a única função que publica no tópico `cmd_vel`**. Isso é importante para garantir que o robô não receba comandos conflitantes.

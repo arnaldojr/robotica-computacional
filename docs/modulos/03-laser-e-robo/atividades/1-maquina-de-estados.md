@@ -15,7 +15,7 @@ Essa abordagem é muito útil em robótica, pois organiza o fluxo de decisões d
 
 ## Exemplo: Robô Limpador com Laser 2D
 
-Agora,, vamos aplicar o conceito de FSM a um **robô limpador** que navega no ambiente, procura áreas para limpar e **desvia** de obstáculos. Para melhorar a capacidade do nosso robô, equipamos‑no com um **sensor laser 2D**.
+Vamos aplicar o conceito de FSM e implementar um **robô limpador** que navega no ambiente, procura áreas para limpar e **desvia** de obstáculos. Para melhorar a capacidade do nosso robô, equipamos‑no com um **sensor laser 2D**.
 
 ### Estados principais
 
@@ -33,12 +33,9 @@ Como mostra a figura acima, nosso robô pode ser caracterizado pelos estados pri
 No caso do nosso robô, detalhamos a ação **Desviar**:
 
 1. **Esperar e escolher** - avalia direções livres (direita, esquerda, traseira):
-
-   1.1. Se **nenhuma** estiver livre → permanece em **Esperar** e tenta novamente.
-
-   1.2. Se **uma** estiver livre → **seleciona** essa direção.
-
-   1.3. Se **mais de uma** estiver livre → **seleciona aleatoriamente** uma delas.
+    - 1.1. Se **nenhuma** estiver livre → permanece em **Esperar** e tenta novamente.
+    - 1.2. Se **uma** estiver livre → **seleciona** essa direção.
+    - 1.3. Se **mais de uma** estiver livre → **seleciona aleatoriamente** uma delas.
 
 2. **Girar** - gira até o **ângulo** aproximado da direção escolhida.
 
@@ -81,7 +78,7 @@ class Limpador:
             'esperar': self.esperar,
             'girar': self.girar,
         }
-
+    # ===== Comportamentos por estado =====
     def procurar(self):
         """Gira em trajetória elíptica (ex.: v=0.1, rz=0.1).
         Transição quando há obstáculo à frente/direita → 'esperar'."""
@@ -109,7 +106,8 @@ class Limpador:
         # TODO: chamar ação/serviço de giro e monitorar conclusão
         # return 'limpar'
         pass
-
+        
+    # ===== Laço de controle =====
     def control(self):
         # ...
         # Executa a ação do estado atual
